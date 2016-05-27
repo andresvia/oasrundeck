@@ -1,0 +1,18 @@
+addons:
+  apt:
+    packages:
+    - ruby-dev
+    - gcc
+    - make
+    - rpm
+before_install:
+- gem install fpm
+deploy:
+  provider: releases
+  api_key:
+    secure: fake_key
+  file_glob: true
+  file: packages/*
+  skip_cleanup: true
+  on:
+    tags: true

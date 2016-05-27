@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -eu
+
+password_file="/var/oasrundeck/default_user_password"
+
+if [ ! -e "$password_file" ]
+then
+  echo
+  echo "!!! Please create default user password file: $password_file !!!"
+  echo
+  exit 1
+fi
+
+if [ "$(stat -c %a "$password_file")" != 600 ]
+then
+  echo
+  echo "!!! Please set default user password file ($password_file) access to 600 !!!"
+  echo
+  exit 1
+fi

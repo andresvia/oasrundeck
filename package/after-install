@@ -1,0 +1,50 @@
+#!/bin/bash
+set -eu
+
+if [ ! -e "/etc/rundeck/ssl/keystore" ]
+then
+  mkdir -p /etc/rundeck/ssl
+  keytool -keystore /etc/rundeck/ssl/keystore -alias rundeck -genkey -keyalg RSA -keypass adminadmin -storepass adminadmin  <<EOF
+rundeck.udistritaloas.edu.co
+plataforma
+Oficina Asesora de Sistemas
+Bogota
+Distrito
+CO
+yes
+EOF
+fi
+
+restart=no
+for oas_file in /etc/rundeck/*.oas
+do
+  regular_file="$(dirname "$oas_file")/$(basename "$oas_file" .oas)"
+  if ! diff "$oas_file" "$regular_file" > /dev/null
+  then
+    cp -vf "$oas_file" "$regular_file"
+    rm -vf "$oas_file"
+    restart=yes
+  fi
+done
+
+if [ ! -e "/etc/rundeck/ssl/truststore" ]
+then
+  cp -vf /etc/rundeck/ssl/keystore /etc/rundeck/ssl/truststore
+fi
+
+if service rundeckd status > /dev/null
+then
+  running=yes
+else
+  running=no
+fi
+
+if [ "$running" = yes ] && [ "$restart" = yes ]
+then
+  service rundeckd restart
+fi
+
+if [ "$running" = no ]
+then
+  service rundeckd start
+fi
