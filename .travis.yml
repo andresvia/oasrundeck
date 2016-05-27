@@ -8,8 +8,6 @@ addons:
     - rpm
 before_install:
 - gem install fpm
-after_install:
-- make
 deploy:
   provider: releases
   api_key:
