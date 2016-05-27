@@ -2,7 +2,7 @@
 
 set -eu
 
-password_file="/var/oasrundeck/default_user_password"
+password_file="/var/lib/oasrundeck/default_user_password"
 
 if [ ! -e "$password_file" ]
 then
@@ -15,7 +15,15 @@ fi
 if [ "$(stat -c %a "$password_file")" != 600 ]
 then
   echo
-  echo "!!! Please set default user password file ($password_file) access to 600 !!!"
+  echo "!!! Please set default user password file in $password_file with access = 600 !!!"
+  echo
+  exit 1
+fi
+
+if [ "$(stat -c %s "$password_file")" -le 16 ]
+then
+  echo
+  echo "!!! Please set default user password file in $password_file with at least 16 characters lenght !!!"
   echo
   exit 1
 fi

@@ -39,6 +39,15 @@ else
   running=no
 fi
 
+password_md5="$(echo -n "$(< /var/lib/oasrundeck/default_user_password)" | md5sum | awk '{print $1}')"
+
+sed -i.bak -e 's|^admin:[^,]\+,\(.*\)|admin:MD5:'"${password_md5}"',\1|' /etc/rundeck/realm.properties
+
+if ! diff /etc/rundeck/realm.properties  /etc/rundeck/realm.properties.bak > /dev/null
+then
+  restart=yes
+fi
+
 if [ "$running" = yes ] && [ "$restart" = yes ]
 then
   service rundeckd restart
